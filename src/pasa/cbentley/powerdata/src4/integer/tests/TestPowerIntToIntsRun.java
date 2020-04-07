@@ -1,6 +1,6 @@
 package pasa.cbentley.powerdata.src4.integer.tests;
 
-public abstract class TestPowerIntToIntsRun extends TestPowerIntToInts {
+public abstract class TestPowerIntToIntsRun extends TestPowerIntToIntsAbstract {
 
 
 }

@@ -5,7 +5,7 @@ import pasa.cbentley.powerdata.spec.src4.power.integers.IPowerLinkIntToInt;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntToInts;
 import pasa.cbentley.powerdata.src4.integer.PowerIntToIntBuild;
 
-public class TestPowerIntToIntBuild extends TestPowerIntToInt implements ITechIntToInts {
+public class TestPowerIntToIntBuild extends TestPowerIntToIntAbstract implements ITechIntToInts {
 
    public IPowerLinkIntToInt createInstance() {
       return new PowerIntToIntBuild(pdc, getTestTech());
@@ -22,6 +22,9 @@ public class TestPowerIntToIntBuild extends TestPowerIntToInt implements ITechIn
    }
 
    public void testGrowthBelowAndTop() {
+      
+      assertNotNull(pdc.getTechFactory());
+      
       ByteObjectManaged bo = pdc.getTechFactory().getPowerIntToIntBuildRootTech();
       bo.set4(PS_OFFSET_04_START_POINTER4, -4);
       bo.set4(PS_OFFSET_05_END_POINTER4, 10);

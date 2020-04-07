@@ -3,8 +3,9 @@ package pasa.cbentley.powerdata.src4.integer.tests;
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntPowerArray;
-import pasa.cbentley.powerdata.src4.PowerDataTestCase;
+import pasa.cbentley.powerdata.src4.TestPowerDataAbstract;
 import pasa.cbentley.powerdata.src4.integer.PowerIntArrayBuild;
 import pasa.cbentley.powerdata.src4.integer.PowerIntArrayRun;
 
@@ -13,7 +14,18 @@ import pasa.cbentley.powerdata.src4.integer.PowerIntArrayRun;
  * @author Charles Bentley
  *
  */
-public class TestIntPowerArray extends PowerDataTestCase {
+public class TestIntPowerArray extends TestPowerDataAbstract {
+
+   protected void add128(PowerIntArrayRun bag) {
+      int count = 0;
+
+      for (int i = 0; i < 256; i = i + 2) {
+         bag.addInt(i);
+         count++;
+      }
+
+      assertEquals(count, 128);
+   }
 
    public void testBagBuild() {
       PowerIntArrayBuild ib = new PowerIntArrayBuild(pdc);
@@ -30,10 +42,13 @@ public class TestIntPowerArray extends PowerDataTestCase {
    }
 
    public void testBagBuildVersionConvert() {
-      PowerIntArrayBuild bag = new PowerIntArrayBuild(pdc);
+      ByteObjectManaged tech = pdc.getTechFactory().getPowerIntArrayBuildRootTechDef();
+      PowerIntArrayBuild bag = new PowerIntArrayBuild(pdc,tech);
       bag.getTech().setVersioning(true);
 
-      assertNull(bag.getMemController());
+      ByteController byteController = bag.getMemController();
+      
+      assertNull(byteController);
 
       bag.addValue(4);
       bag.addValue(5);
@@ -58,6 +73,12 @@ public class TestIntPowerArray extends PowerDataTestCase {
 
    }
 
+   public void testIntBagByteArrayConstructor() {
+
+      PowerIntArrayRun bag = new PowerIntArrayRun(pdc, pdc.getTechFactory().getPowerIntArrayRunRoot());
+      add128(bag);
+   }
+
    /**
     * Stores 
     */
@@ -68,63 +89,64 @@ public class TestIntPowerArray extends PowerDataTestCase {
 
       assertEquals(ITechIntPowerArray.ARRAY_INT_BASIC_SIZE, tech.getLength());
       assertEquals(54, tech.getLength());
-
-      //setting the flag here forces
-      tech.setVersioning(true);
-
-      assertEquals(56, tech.getLength());
+      tech.setVersioning(true); //setting the flag here forces
+      assertEquals(56, tech.getLength()); //why 54+2? 2 bytes are used in suffix as the version
 
       assertEquals(0, tech.getVersion());
 
       //tech length is 34
-      PowerIntArrayRun bag = new PowerIntArrayRun(pdc, tech);
-      
+      PowerIntArrayRun intArray = new PowerIntArrayRun(pdc, tech);
+
       //the tech stays a simple byte object but the underlying byte array represents a ByteObejctManaged
-      assertEquals(0xFFFF, tech.getLength());
-      assertEquals(36, bag.getLength());
+      assertEquals(0xFFFF, tech.get2Unsigned(ITechByteObject.A_OBJECT_OFFSET_3_LENGTH2)); //but the length of byteobject is blacked
+      assertEquals(56, tech.getLength()); //why 54+2?
+      assertEquals(56, intArray.getLength());
 
-      System.out.println(bag);
+      //they keep the same object as reference
+      assertNotSameReference(tech, intArray.getTech());
+      
+      System.out.println(intArray);
 
-      assertEquals(0, bag.getVersion());
+      assertEquals(0, intArray.getVersion());
 
-      bag.addValue(4);
-      assertEquals(1, bag.getVersion());
-      assertEquals(1, bag.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
+      intArray.addValue(4);
+      assertEquals(1, intArray.getVersion());
+      assertEquals(1, intArray.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
 
-      System.out.println(bag);
-      assertEquals(1, bag.getVersion());
-      bag.addValue(5);
+      System.out.println(intArray);
+      assertEquals(1, intArray.getVersion());
+      intArray.addValue(5);
 
-      assertEquals(2, bag.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
+      assertEquals(2, intArray.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
 
-      bag.addValue(6);
+      intArray.addValue(6);
 
-      int[] in = bag.getValues();
+      int[] in = intArray.getValues();
       assertEquals(in.length, 3);
       assertEquals(in[0], 4);
       assertEquals(in[1], 5);
       assertEquals(in[2], 6);
 
-      assertEquals(3, bag.getVersion());
+      assertEquals(3, intArray.getVersion());
 
-      bag.addValue(124);
+      intArray.addValue(124);
 
-      System.out.println(bag);
+      System.out.println(intArray);
 
-      in = bag.getValues();
+      in = intArray.getValues();
       assertEquals(in.length, 4);
       assertEquals(in[0], 4);
       assertEquals(in[1], 5);
       assertEquals(in[2], 6);
       assertEquals(in[3], 124);
 
-      assertEquals(4, bag.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
+      assertEquals(4, intArray.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
 
-      bag.addValue(125);
-      bag.addValue(126);
+      intArray.addValue(125);
+      intArray.addValue(126);
 
-      System.out.println(bag);
-      in = bag.getValues();
+      System.out.println(intArray);
+      in = intArray.getValues();
       assertEquals(in.length, 6);
       assertEquals(in[0], 4);
       assertEquals(in[1], 5);
@@ -133,29 +155,29 @@ public class TestIntPowerArray extends PowerDataTestCase {
       assertEquals(in[4], 125);
       assertEquals(in[5], 126);
 
-      assertEquals(6, bag.getSize());
-      assertEquals(6, bag.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
+      assertEquals(6, intArray.getSize());
+      assertEquals(6, intArray.get4(ITechIntPowerArray.ARRAY_OFFSET_05_SIZE4));
 
-      assertEquals(Integer.MAX_VALUE, bag.getValueOrderCount(3));
-      assertEquals(1, bag.getValueOrderCount(4));
-      assertEquals(2, bag.getValueOrderCount(5));
-      assertEquals(3, bag.getValueOrderCount(6));
-      assertEquals(4, bag.getValueOrderCount(124));
-      assertEquals(5, bag.getValueOrderCount(125));
-      assertEquals(6, bag.getValueOrderCount(126));
-      assertEquals(Integer.MAX_VALUE, bag.getValueOrderCount(127));
+      assertEquals(Integer.MAX_VALUE, intArray.getValueOrderCount(3));
+      assertEquals(1, intArray.getValueOrderCount(4));
+      assertEquals(2, intArray.getValueOrderCount(5));
+      assertEquals(3, intArray.getValueOrderCount(6));
+      assertEquals(4, intArray.getValueOrderCount(124));
+      assertEquals(5, intArray.getValueOrderCount(125));
+      assertEquals(6, intArray.getValueOrderCount(126));
+      assertEquals(Integer.MAX_VALUE, intArray.getValueOrderCount(127));
 
-      assertEquals(Integer.MAX_VALUE, bag.getValuePosition(3));
-      assertEquals(1, bag.getValuePosition(4));
-      assertEquals(2, bag.getValuePosition(5));
-      assertEquals(3, bag.getValuePosition(6));
-      assertEquals(4, bag.getValuePosition(124));
-      assertEquals(5, bag.getValuePosition(125));
-      assertEquals(6, bag.getValuePosition(126));
-      assertEquals(Integer.MAX_VALUE, bag.getValuePosition(127));
+      assertEquals(Integer.MAX_VALUE, intArray.getValuePosition(3));
+      assertEquals(1, intArray.getValuePosition(4));
+      assertEquals(2, intArray.getValuePosition(5));
+      assertEquals(3, intArray.getValuePosition(6));
+      assertEquals(4, intArray.getValuePosition(124));
+      assertEquals(5, intArray.getValuePosition(125));
+      assertEquals(6, intArray.getValuePosition(126));
+      assertEquals(Integer.MAX_VALUE, intArray.getValuePosition(127));
 
-      bag.addValue(3);
-      in = bag.getValues();
+      intArray.addValue(3);
+      in = intArray.getValues();
       assertEquals(in.length, 7);
       assertEquals(in[0], 3);
       assertEquals(in[1], 4);
@@ -163,39 +185,39 @@ public class TestIntPowerArray extends PowerDataTestCase {
       assertEquals(in[3], 6);
       assertEquals(in[4], 124);
 
-      bag.addValue(7);
-      in = bag.getValues();
+      intArray.addValue(7);
+      in = intArray.getValues();
       assertEquals(in.length, 8);
       assertEquals(in[0], 3);
       assertEquals(in[4], 7);
 
       //add last
-      bag.addValue(127);
-      in = bag.getValues();
+      intArray.addValue(127);
+      in = intArray.getValues();
       assertEquals(in.length, 9);
       assertEquals(in[0], 3);
       assertEquals(in[4], 7);
       assertEquals(in[8], 127);
 
       //add last
-      bag.addValue(129);
-      in = bag.getValues();
+      intArray.addValue(129);
+      in = intArray.getValues();
       assertEquals(in.length, 10);
 
-      bag.addValue(128);
-      in = bag.getValues();
+      intArray.addValue(128);
+      in = intArray.getValues();
       assertEquals(in.length, 11);
 
-      bag.addValue(-16);
-      bag.addValue(-15);
+      intArray.addValue(-16);
+      intArray.addValue(-15);
 
-      System.out.println(bag);
-      assertEquals(bag.getValueOrderCount(-16), 3);
-      assertEquals(bag.getValueOrderCount(-15), 4);
+      System.out.println(intArray);
+      assertEquals(intArray.getValueOrderCount(-16), 3);
+      assertEquals(intArray.getValueOrderCount(-15), 4);
 
-      System.out.println(bag.toString());
+      System.out.println(intArray.toString());
 
-      in = bag.getValues();
+      in = intArray.getValues();
       assertEquals(in.length, 13);
       assertEquals(in[0], -128);
       assertEquals(in[1], -127);
@@ -211,12 +233,6 @@ public class TestIntPowerArray extends PowerDataTestCase {
       assertEquals(in[11], 126);
       assertEquals(in[12], 127);
 
-   }
-
-   public void testIntBagByteArrayConstructor() {
-
-      PowerIntArrayRun bag = new PowerIntArrayRun(pdc, pdc.getTechFactory().getPowerIntArrayRunRoot());
-      add128(bag);
    }
 
    public void testIntBagSimpleByteLeastEfficient() {
@@ -248,14 +264,14 @@ public class TestIntPowerArray extends PowerDataTestCase {
 
       //assertEquals(291, bom.getLength());
       assertEquals(35, bom.getType());
-      
+
       //reuse the data. read it as a single byte array data source
       //byte data cannot be trust... exception i
       ByteController bc = new ByteController(boc, null, inefficientData);
       PowerIntArrayRun newbag = (PowerIntArrayRun) bc.getAgentRoot();
 
       System.out.println(newbag);
-      
+
       ints = newbag.getInts();
       assertEquals(ints.length, 128);
 
@@ -286,17 +302,6 @@ public class TestIntPowerArray extends PowerDataTestCase {
       assertEquals(47, ii[3]);
       assertEquals(4, ii.length);
 
-   }
-
-   protected void add128(PowerIntArrayRun bag) {
-      int count = 0;
-
-      for (int i = 0; i < 256; i = i + 2) {
-         bag.addInt(i);
-         count++;
-      }
-
-      assertEquals(count, 128);
    }
 
    public void testIntBagSimpleByteNegative() {

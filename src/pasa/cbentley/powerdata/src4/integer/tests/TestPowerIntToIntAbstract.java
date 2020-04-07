@@ -3,17 +3,14 @@ package pasa.cbentley.powerdata.src4.integer.tests;
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteControler;
+import pasa.cbentley.core.src4.logging.IDLogConfig;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.powerdata.spec.src4.power.integers.IPowerLinkIntToInt;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntToInt;
-import pasa.cbentley.powerdata.src4.PowerDataTestCase;
+import pasa.cbentley.powerdata.src4.TestPowerDataAbstract;
 import pasa.cbentley.powerdata.src4.ctx.PDCtx;
 
-public abstract class TestPowerIntToInt extends PowerDataTestCase implements ITechIntToInt {
-
-   protected PDCtx pdc;
-
-   protected BOCtx boc;
+public abstract class TestPowerIntToIntAbstract extends TestPowerDataAbstract implements ITechIntToInt {
 
    public abstract ItiConfig[] createIntToInt();
 
@@ -47,13 +44,16 @@ public abstract class TestPowerIntToInt extends PowerDataTestCase implements ITe
       }
    }
 
-   public void setUpMord() {
-      boc = new BOCtx(uc);
-      pdc = new PDCtx(uc, boc);
+   public void setupAbstract() {
+      super.setupAbstract();
+      
+      IDLogConfig config = uc.toDLog().getDefault().getConfig();
+      config.setFlagTag(FLAG_25_PRINT_NULL, true);
    }
 
    protected IPowerLinkIntToInt getIntToIntFrom(byte[] data) {
       ByteController bc = new ByteController(boc, data);
+      bc.setFactory(pdc.getFactory());
       IPowerLinkIntToInt p = (IPowerLinkIntToInt) bc.getAgentRoot();
       return p;
    }
@@ -156,29 +156,30 @@ public abstract class TestPowerIntToInt extends PowerDataTestCase implements ITe
 
    public void testSerializeOne() {
       ItiConfig[] configs = createIntToInt();
+      
       for (int i = 0; i < configs.length; i++) {
          String name = configs[i].name;
-         IPowerLinkIntToInt p = configs[i].c;
+         IPowerLinkIntToInt dataStruc = configs[i].c;
 
-         p.setKeyData(5, 5);
-         assertEquals(name, 5, p.getKeyData(5));
-         int s = p.getSize();
+         dataStruc.setKeyData(5, 5);
+         assertEquals(name, 5, dataStruc.getKeyData(5));
+         int s = dataStruc.getSize();
 
-         byte[] d = p.serializePack();
+         byte[] data = dataStruc.serializePack();
 
-         assertEquals(1, IntUtils.readInt24BE(d, ITechByteControler.MEMC_OFFSET_05_NUM_AGENTS3));
+         assertEquals(1, IntUtils.readInt24BE(data, ITechByteControler.MEMC_OFFSET_05_NUM_AGENTS3));
 
-         IPowerLinkIntToInt p2 = getIntToIntFrom(d);
+         IPowerLinkIntToInt p2 = getIntToIntFrom(data);
 
          assertEquals(name, s, p2.getSize());
          if (name.equals("EmptiesDesc")) {
             assertEquals(true, true);
-            logPrint(p);
+            logPrint(dataStruc);
             logPrint(p2);
          }
          assertEquals(name, 5, p2.getKeyData(5));
 
-         assertEquals(name, 5, p.getKeyData(5));
+         assertEquals(name, 5, dataStruc.getKeyData(5));
       }
    }
 }

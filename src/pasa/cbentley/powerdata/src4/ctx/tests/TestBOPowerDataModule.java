@@ -1,10 +1,10 @@
 package pasa.cbentley.powerdata.src4.ctx.tests;
 
 import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
-import pasa.cbentley.powerdata.src4.PowerDataTestCase;
+import pasa.cbentley.powerdata.src4.TestPowerDataAbstract;
 import pasa.cbentley.powerdata.src4.ctx.BOPowerDataModule;
 
-public class TestBOPowerDataModule extends PowerDataTestCase {
+public class TestBOPowerDataModule extends TestPowerDataAbstract {
 
    public void setUpMord() {
 

@@ -4,11 +4,12 @@ import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.powerdata.spec.src4.power.integers.IPowerLinkIntToInts;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntToInts;
 
-public abstract class TestPowerIntToInts extends TestPowerIntToInt implements ITechIntToInts {
+public abstract class TestPowerIntToIntsAbstract extends TestPowerIntToIntAbstract implements ITechIntToInts {
 
-   public void setUpMord() {
-      super.setUpMord();
+   public void setupAbstract() {
+      super.setupAbstract();
    }
+
    
    public void testBasics() {
 

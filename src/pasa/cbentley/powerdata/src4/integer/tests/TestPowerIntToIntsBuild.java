@@ -5,7 +5,7 @@ import pasa.cbentley.powerdata.spec.src4.power.integers.IPowerLinkIntToInts;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntToIntsBuild;
 import pasa.cbentley.powerdata.src4.integer.PowerIntToIntsBuild;
 
-public class TestPowerIntToIntsBuild extends TestPowerIntToInts implements ITechIntToIntsBuild {
+public class TestPowerIntToIntsBuild extends TestPowerIntToIntsAbstract implements ITechIntToIntsBuild {
 
    public ItisBuildConfig[] createInstance() {
       ItisBuildConfig[] configs = new ItisBuildConfig[16];
@@ -58,8 +58,9 @@ public class TestPowerIntToIntsBuild extends TestPowerIntToInts implements ITech
       return getTech(sort, empties, false);
    }
 
-   public void setUpMord() {
-      super.setUpMord();
+   public void setupAbstract() {
+      super.setupAbstract();
    }
+
 
 }
