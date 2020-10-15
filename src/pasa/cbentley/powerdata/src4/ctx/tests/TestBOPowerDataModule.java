@@ -23,7 +23,6 @@ public class TestBOPowerDataModule extends TestPowerDataAbstract {
 
       assertEquals(fac, pdc.getPowerFactory());
 
-      modulePowerData.subToStringType(0);
 
    }
 
