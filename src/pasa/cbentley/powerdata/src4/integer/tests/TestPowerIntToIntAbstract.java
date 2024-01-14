@@ -1,8 +1,8 @@
 package pasa.cbentley.powerdata.src4.integer.tests;
 
 import pasa.cbentley.byteobjects.src4.core.ByteController;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOByteControler;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteControler;
 import pasa.cbentley.core.src4.logging.IDLogConfig;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.powerdata.spec.src4.power.integers.IPowerLinkIntToInt;
@@ -167,7 +167,7 @@ public abstract class TestPowerIntToIntAbstract extends TestPowerDataAbstract im
 
          byte[] data = dataStruc.serializePack();
 
-         assertEquals(1, IntUtils.readInt24BE(data, ITechByteControler.MEMC_OFFSET_05_NUM_AGENTS3));
+         assertEquals(1, IntUtils.readInt24BE(data, IBOByteControler.MEMC_OFFSET_05_NUM_AGENTS3));
 
          IPowerLinkIntToInt p2 = getIntToIntFrom(data);
 

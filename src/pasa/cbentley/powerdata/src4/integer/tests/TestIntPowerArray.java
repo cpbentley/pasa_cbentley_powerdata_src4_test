@@ -3,7 +3,7 @@ package pasa.cbentley.powerdata.src4.integer.tests;
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.powerdata.spec.src4.power.itech.ITechIntPowerArray;
 import pasa.cbentley.powerdata.src4.TestPowerDataAbstract;
 import pasa.cbentley.powerdata.src4.integer.PowerIntArrayBuild;
@@ -98,7 +98,7 @@ public class TestIntPowerArray extends TestPowerDataAbstract {
       PowerIntArrayRun intArray = new PowerIntArrayRun(pdc, tech);
 
       //the tech stays a simple byte object but the underlying byte array represents a ByteObejctManaged
-      assertEquals(0xFFFF, tech.get2Unsigned(ITechByteObject.A_OBJECT_OFFSET_3_LENGTH2)); //but the length of byteobject is blacked
+      assertEquals(0xFFFF, tech.get2Unsigned(IByteObject.A_OBJECT_OFFSET_3_LENGTH2)); //but the length of byteobject is blacked
       assertEquals(56, tech.getLength()); //why 54+2?
       assertEquals(56, intArray.getLength());
 
