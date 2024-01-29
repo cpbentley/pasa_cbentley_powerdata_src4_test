@@ -48,7 +48,7 @@ public abstract class TestPowerIntToIntAbstract extends TestPowerDataAbstract im
       super.setupAbstract();
       
       IDLogConfig config = uc.toDLog().getDefault().getConfig();
-      config.setFlagTag(FLAG_25_PRINT_NULL, true);
+      config.setFlagTag(FLAG_02_PRINT_NULL, true);
    }
 
    protected IPowerLinkIntToInt getIntToIntFrom(byte[] data) {
